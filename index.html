@@ -12,6 +12,7 @@
       --masters-green: #006747;
       --masters-green-dark: #004D35;
       --masters-gold: #C8A951;
+      --masters-yellow: #FBF308;
       --masters-cream: #F2EDDE;
       --red: #C41E3A;
       --green-score: #006747;
@@ -120,14 +121,14 @@
     }
 
     .pot-badge {
-      background: var(--masters-green);
-      color: var(--masters-gold);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 13px;
+      background: transparent;
+      color: var(--masters-green);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 16px;
       font-weight: 700;
       padding: 5px 14px;
       border-radius: 4px;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
@@ -780,6 +781,13 @@
         return;
       }
 
+      // Save which teams are currently open
+      const openTeams = new Set();
+      board.querySelectorAll('.team-card.open').forEach(card => {
+        const teamName = card.querySelector('.team-name')?.textContent;
+        if (teamName) openTeams.add(teamName);
+      });
+
       // Determine round status
       const currentRound = mastersData.currentRound || '1';
       const roundNum = parseInt(currentRound, 10) || 1;
@@ -807,8 +815,9 @@
         const isLeader = rank === 1 && team.hasData;
         const scoreStr = team.hasData ? fmtToPar(team.totalToPar) : '—';
         const sClass = team.hasData ? scoreClass(team.totalToPar) : 'even';
+        const wasOpen = openTeams.has(team.owner);
 
-        html += `<div class="team-card ${isLeader ? 'leader' : ''}" onclick="this.classList.toggle('open')">
+        html += `<div class="team-card ${isLeader ? 'leader' : ''} ${wasOpen ? 'open' : ''}" onclick="this.classList.toggle('open')">
       <div class="team-header">
         <div class="team-rank">${rank}</div>
         <div class="team-name">${team.owner}</div>
@@ -827,9 +836,6 @@
         </div>`;
 
         for (const p of team.players) {
-          const tierBadge = p.tier ? `<span class="tier-badge tier-${p.tier}">T${p.tier}</span>` : '';
-          const statusTag = p.missedCut ? ' <span class="player-status-tag">MC</span>'
-            : p.wd ? ' <span class="player-status-tag">WD</span>' : '';
 
           const toParStr = fmtToPar(p.toPar);
           const todayStr = fmtToPar(p.today);
@@ -838,7 +844,7 @@
           const thruDisplay = p.missedCut ? 'MC' : p.wd ? 'WD' : p.thru;
 
           html += `<div class="player-row">
-        <div class="player-name">${p.name}${tierBadge}${statusTag}</div>
+        <div class="player-name">${p.name}</div>
         <div class="player-pos">${p.pos}</div>
         <div class="player-thru">${thruDisplay}</div>
         <div class="player-today ${todayClass}">${todayStr}</div>
