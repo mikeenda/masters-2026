@@ -1,823 +1,592 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Masters 2026 — League Leaderboard</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700;800&display=swap');
-
-    :root {
-      --masters-green: #006747;
-      --masters-green-dark: #004D35;
-      --masters-gold: #C8A951;
-      --masters-yellow: #FBF308;
-      --masters-cream: #F2EDDE;
-      --red: #C41E3A;
-      --green-score: #006747;
-      --grey-score: #555;
-      --bg: #FFFFFF;
-      --bg-page: #F7F5F0;
-      --text: #1B2A1B;
-      --text-light: #6B7B6B;
-      --border: #D4CEBC;
-      --border-light: #E8E3D6;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'EB Garamond', Georgia, 'Times New Roman', serif;
-      background: var(--bg-page);
-      color: var(--text);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── Header ── */
-    header {
-      background: var(--masters-green);
-      color: white;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      border-bottom: 3px solid var(--masters-gold);
-    }
-
-    .header-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .header-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .header-title {
-      font-family: 'EB Garamond', Georgia, serif;
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-
-    .header-title em {
-      font-style: italic;
-      font-weight: 400;
-      font-size: 18px;
-      opacity: 0.8;
-      margin-left: 4px;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .live-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #4ade80;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.35;
-      }
-    }
-
-    /* ── Pot & Info Bar ── */
-    .info-bar {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 14px 20px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .pot-badge {
-      background: transparent;
-      color: var(--masters-green);
-      font-family: 'EB Garamond', Georgia, serif;
-      font-size: 16px;
-      font-weight: 700;
-      padding: 5px 14px;
-      border-radius: 4px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .round-status {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 13px;
-      color: var(--text-light);
-      font-weight: 600;
-    }
-
-    .round-status .live-badge {
-      display: inline-block;
-      background: var(--red);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 3px;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
-
-    /* ── Section title ── */
-    .leaderboard {
-      max-width: 960px;
-      margin: 16px auto 0;
-      padding: 0 20px 60px;
-    }
-
-    .section-title {
-      font-family: 'EB Garamond', Georgia, serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--masters-green);
-      text-align: center;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid var(--masters-gold);
-    }
-
-    /* ── Team card ── */
-    .team-card {
-      background: var(--bg);
-      border: 1px solid var(--border-light);
-      border-radius: 6px;
-      margin-bottom: 6px;
-      overflow: hidden;
-      transition: box-shadow 0.15s;
-    }
-
-    .team-card:hover {
-      box-shadow: 0 2px 12px rgba(0, 103, 71, 0.08);
-    }
-
-    .team-card.leader {
-      border: 2px solid var(--masters-gold);
-      box-shadow: 0 2px 16px rgba(200, 169, 81, 0.15);
-    }
-
-    .team-card.leader .team-rank {
-      background: var(--masters-gold);
-      color: white;
-    }
-
-    .team-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .team-rank {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--masters-green);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 14px;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-
-    .team-name {
-      flex: 1;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .team-score-block {
-      text-align: right;
-      min-width: 70px;
-    }
-
-    .team-score {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 24px;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .team-score.under {
-      color: var(--green-score);
-    }
-
-    .team-score.over {
-      color: var(--red);
-    }
-
-    .team-score.even {
-      color: var(--grey-score);
-    }
-
-    .team-avg {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 11px;
-      color: var(--text-light);
-      font-weight: 600;
-      margin-top: 1px;
-    }
-
-    .team-chevron {
-      font-size: 12px;
-      color: var(--text-light);
-      transition: transform 0.2s;
-      flex-shrink: 0;
-    }
-
-    .team-card.open .team-chevron {
-      transform: rotate(180deg);
-    }
-
-    /* ── Player rows ── */
-    .team-players {
-      display: none;
-      border-top: 1px solid var(--border-light);
-    }
-
-    .team-card.open .team-players {
-      display: block;
-    }
-
-    .player-row-header {
-      display: flex;
-      align-items: center;
-      padding: 6px 16px 6px 60px;
-      background: var(--masters-cream);
-      border-bottom: 1px solid var(--border-light);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-light);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    .player-row-header .ph-name {
-      flex: 1;
-    }
-
-    .player-row-header .ph-pos {
-      width: 44px;
-      text-align: center;
-    }
-
-    .player-row-header .ph-thru {
-      width: 44px;
-      text-align: center;
-    }
-
-    .player-row-header .ph-today {
-      width: 50px;
-      text-align: center;
-    }
-
-    .player-row-header .ph-total {
-      width: 56px;
-      text-align: right;
-    }
-
-    .player-row {
-      display: flex;
-      align-items: center;
-      padding: 9px 16px 9px 60px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 14px;
-    }
-
-    .player-row:last-child {
-      border-bottom: none;
-    }
-
-    .player-name {
-      flex: 1;
-      font-weight: 600;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .tier-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .tier-1 {
-      background: var(--masters-green);
-      color: white;
-    }
-
-    .tier-2 {
-      background: #2D8B6A;
-      color: white;
-    }
-
-    .tier-3 {
-      background: var(--masters-gold);
-      color: #333;
-    }
-
-    .tier-4 {
-      background: #888;
-      color: white;
-    }
-
-    .player-pos {
-      width: 44px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-light);
-    }
-
-    .player-thru {
-      width: 44px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-light);
-      font-weight: 600;
-    }
-
-    .player-today {
-      width: 50px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .player-today.under {
-      color: var(--green-score);
-    }
-
-    .player-today.over {
-      color: var(--red);
-    }
-
-    .player-today.even {
-      color: var(--grey-score);
-    }
-
-    .player-total {
-      width: 56px;
-      text-align: right;
-      font-size: 15px;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .player-total.under {
-      color: var(--green-score);
-    }
-
-    .player-total.over {
-      color: var(--red);
-    }
-
-    .player-total.even {
-      color: var(--grey-score);
-    }
-
-    .player-status-tag {
-      display: inline-block;
-      font-size: 9px;
-      font-weight: 800;
-      padding: 1px 5px;
-      border-radius: 2px;
-      background: rgba(196, 30, 58, 0.1);
-      color: var(--red);
-      letter-spacing: 0.05em;
-    }
-
-    /* ── Footer ── */
-    .footer {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 20px 40px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 12px;
-      color: var(--text-light);
-      line-height: 1.8;
-    }
-
-    .footer strong {
-      color: var(--text);
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 640px) {
-      .header-title {
-        font-size: 20px;
-      }
-
-      .header-title em {
-        display: none;
-      }
-
-      .section-title {
-        font-size: 22px;
-      }
-
-      .team-header {
-        padding: 10px 12px;
-        gap: 8px;
-      }
-
-      .team-name {
-        font-size: 16px;
-      }
-
-      .team-score {
-        font-size: 20px;
-      }
-
-      .player-row {
-        padding-left: 44px;
-        font-size: 13px;
-      }
-
-      .player-row-header {
-        padding-left: 44px;
-      }
-
-      .player-today {
-        display: none;
-      }
-
-      .player-row-header .ph-today {
-        display: none;
-      }
-
-      .info-bar {
-        padding: 10px 14px 0;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masters 2026 — League Leaderboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --masters-green: #006747;
+    --masters-green-dark: #004D35;
+    --masters-gold: #C8A951;
+    --masters-cream: #F2EDDE;
+    --red: #C41E3A;
+    --green-score: #006747;
+    --grey-score: #555;
+    --bg: #FFFFFF;
+    --bg-page: #F7F5F0;
+    --text: #1B2A1B;
+    --text-light: #6B7B6B;
+    --border: #D4CEBC;
+    --border-light: #E8E3D6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'EB Garamond', Georgia, 'Times New Roman', serif;
+    background: var(--bg-page);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--masters-green);
+    color: white;
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 3px solid var(--masters-gold);
+  }
+  .header-inner {
+    max-width: 960px; margin: 0 auto;
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .header-title {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 26px; font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .header-title em {
+    font-style: italic; font-weight: 400;
+    font-size: 18px; opacity: 0.8; margin-left: 4px;
+  }
+  .header-right {
+    display: flex; align-items: center; gap: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 12px; color: rgba(255,255,255,0.7);
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #4ade80;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  /* ── Pot & Info Bar ── */
+  .info-bar {
+    max-width: 960px; margin: 0 auto;
+    padding: 14px 20px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .pot-badge {
+    background: var(--masters-green);
+    color: var(--masters-gold);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 13px; font-weight: 700;
+    padding: 5px 14px; border-radius: 4px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .round-status {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 13px; color: var(--text-light); font-weight: 600;
+  }
+  .round-status .live-badge {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    padding: 2px 8px; border-radius: 3px;
+    font-size: 10px; font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  /* ── Section title ── */
+  .leaderboard {
+    max-width: 960px; margin: 16px auto 0; padding: 0 20px 60px;
+  }
+  .section-title {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 28px; font-weight: 700;
+    color: var(--masters-green);
+    text-align: center;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--masters-gold);
+  }
+
+  /* ── Team card ── */
+  .team-card {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+  .team-card:hover { box-shadow: 0 2px 12px rgba(0,103,71,0.08); }
+  .team-card.leader {
+    border: 2px solid var(--masters-gold);
+    box-shadow: 0 2px 16px rgba(200,169,81,0.15);
+  }
+  .team-card.leader .team-rank {
+    background: var(--masters-gold); color: white;
+  }
+
+  .team-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .team-rank {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--masters-green);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 14px; font-weight: 800; flex-shrink: 0;
+  }
+  .team-name {
+    flex: 1;
+    font-size: 20px; font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .team-score-block { text-align: right; min-width: 70px; }
+  .team-score {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 24px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .team-score.under { color: var(--green-score); }
+  .team-score.over { color: var(--red); }
+  .team-score.even { color: var(--grey-score); }
+  .team-avg {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 11px; color: var(--text-light); font-weight: 600;
+    margin-top: 1px;
+  }
+  .team-chevron {
+    font-size: 12px; color: var(--text-light); transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .team-card.open .team-chevron { transform: rotate(180deg); }
+
+  /* ── Player rows ── */
+  .team-players {
+    display: none;
+    border-top: 1px solid var(--border-light);
+  }
+  .team-card.open .team-players { display: block; }
+
+  .player-row-header {
+    display: flex; align-items: center;
+    padding: 6px 16px 6px 60px;
+    background: var(--masters-cream);
+    border-bottom: 1px solid var(--border-light);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 10px; font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .player-row-header .ph-name { flex: 1; }
+  .player-row-header .ph-pos { width: 44px; text-align: center; }
+  .player-row-header .ph-thru { width: 44px; text-align: center; }
+  .player-row-header .ph-today { width: 50px; text-align: center; }
+  .player-row-header .ph-total { width: 56px; text-align: right; }
+
+  .player-row {
+    display: flex; align-items: center;
+    padding: 9px 16px 9px 60px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 14px;
+  }
+  .player-row:last-child { border-bottom: none; }
+
+  .player-name {
+    flex: 1; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tier-badge {
+    display: inline-block;
+    padding: 1px 6px; border-radius: 3px;
+    font-size: 9px; font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .tier-1 { background: var(--masters-green); color: white; }
+  .tier-2 { background: #2D8B6A; color: white; }
+  .tier-3 { background: var(--masters-gold); color: #333; }
+  .tier-4 { background: #888; color: white; }
+
+  .player-pos {
+    width: 44px; text-align: center;
+    font-size: 12px; font-weight: 700; color: var(--text-light);
+  }
+  .player-thru {
+    width: 44px; text-align: center;
+    font-size: 12px; color: var(--text-light); font-weight: 600;
+  }
+  .player-today {
+    width: 50px; text-align: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .player-today.under { color: var(--green-score); }
+  .player-today.over { color: var(--red); }
+  .player-today.even { color: var(--grey-score); }
+
+  .player-total {
+    width: 56px; text-align: right;
+    font-size: 15px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .player-total.under { color: var(--green-score); }
+  .player-total.over { color: var(--red); }
+  .player-total.even { color: var(--grey-score); }
+
+  .player-status-tag {
+    display: inline-block;
+    font-size: 9px; font-weight: 800;
+    padding: 1px 5px; border-radius: 2px;
+    background: rgba(196,30,58,0.1); color: var(--red);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    max-width: 960px; margin: 0 auto;
+    padding: 0 20px 40px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 12px; color: var(--text-light); line-height: 1.8;
+  }
+  .footer strong { color: var(--text); }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .header-title { font-size: 20px; }
+    .header-title em { display: none; }
+    .section-title { font-size: 22px; }
+    .team-header { padding: 10px 12px; gap: 8px; }
+    .team-name { font-size: 16px; }
+    .team-score { font-size: 20px; }
+    .player-row { padding-left: 44px; font-size: 13px; }
+    .player-row-header { padding-left: 44px; }
+    .player-today { display: none; }
+    .player-row-header .ph-today { display: none; }
+    .info-bar { padding: 10px 14px 0; }
+  }
+</style>
 </head>
-
 <body>
 
-  <header>
-    <div class="header-inner">
-      <div class="header-logo">
-        <span class="header-title">Masters 2026 <em>League</em></span>
-      </div>
-      <div class="header-right">
-        <div class="live-dot" id="liveDot"></div>
-        <span id="updateTime">Loading…</span>
-      </div>
+<header>
+  <div class="header-inner">
+    <div class="header-logo">
+      <span class="header-title">Masters 2026 <em>League</em></span>
     </div>
-  </header>
-
-  <div class="info-bar">
-    <span class="pot-badge">Total Pot: $50</span>
-    <span class="round-status" id="roundStatus">Loading…</span>
+    <div class="header-right">
+      <div class="live-dot" id="liveDot"></div>
+      <span id="updateTime">Loading…</span>
+    </div>
   </div>
+</header>
 
-  <div class="leaderboard">
-    <p class="section-title">Leaders</p>
-    <div id="board"></div>
-  </div>
+<div class="info-bar">
+  <span class="pot-badge">Total Pot: $50</span>
+  <span class="round-status" id="roundStatus">Loading…</span>
+</div>
 
-  <div class="footer">
-    <strong>Scoring:</strong> Team score = sum of all 6 players' to-par scores. Lowest wins.<br>
-    <strong>Missed Cut:</strong> Player scores +8 per round on Saturday &amp; Sunday (80 strokes).<br>
-    <strong>Tiebreaker:</strong> Team with the best player finish <br>
-    Auto-refreshes every 60 seconds. Click any team to see individual golfer scores.
-  </div>
+<div class="leaderboard">
+  <p class="section-title">Leaders</p>
+  <div id="board"></div>
+</div>
 
-  <script>
-    // ─── TEAM DATA ─────────────────────────────────────────────────────────────────
+<div class="footer">
+  <strong>Scoring:</strong> Weekend rosters — top 4 players per team after the cut. Team score = sum of 4 players' to-par. Lowest wins.<br>
+  <strong>Missed Cut:</strong> Any team with fewer than 4 players scores +8 per missing player per round on Sat &amp; Sun.<br>
+  <strong>Tiebreaker:</strong> Predict the winning score to par. Closest without going over wins.<br>
+  Auto-refreshes every 60 seconds. Click any team to see individual golfer scores.
+</div>
 
-    const TEAMS = [
-      { owner: "Mike", players: ["Ludvig Aberg", "Si Woo Kim", "Kurt Kitayama", "Dustin Johnson", "Sepp Straka", "Sungjae Im"] },
-      { owner: "Nodes", players: ["Tommy Fleetwood", "Viktor Hovland", "Adam Scott", "Ben Griffin", "Haotong Li", "Matt McCarty"] },
-      { owner: "Rhett", players: ["Matt Fitzpatrick", "Chris Gotterup", "Nicolai Hojgaard", "Daniel Berger", "Ryan Fox", "Jason Day"] },
-      { owner: "Benny", players: ["Justin Rose", "Justin Thomas", "Harry Hall", "Jacob Bridgeman", "Aaron Rai", "Collin Morikawa"] },
-      { owner: "Juan", players: ["Xander Schauffele", "Jordan Spieth", "Cameron Smith", "Wyndham Clark", "Alex Noren", "Tyrrell Hatton"] },
-      { owner: "Jack", players: ["Cameron Young", "Brooks Koepka", "Jake Knapp", "Maverick McNealy", "Marco Penge", "Casey Jarvis"] },
-      { owner: "Drake", players: ["Bryson DeChambeau", "Min Woo Lee", "Russell Henley", "Harris English", "Keegan Bradley", "Sergio Garcia"] },
-      { owner: "Henny", players: ["Rory McIlroy", "Robert MacIntyre", "Patrick Cantlay", "Corey Conners", "Max Homa", "Max Greyserman"] },
-      { owner: "Buso", players: ["Jon Rahm", "Akshay Bhatia", "Sam Burns", "Patrick Reed", "Gary Woodland", "Ethan Fang"] },
-      { owner: "Gokie", players: ["John Keefer", "Scottie Scheffler", "Shane Lowry", "J.J. Spaun", "Rasmus Hojgaard", "Hideki Matsuyama"] }
-    ];
+<script>
+// ─── TEAM DATA ─────────────────────────────────────────────────────────────────
 
-    const PLAYER_TIERS = {
-      "Ludvig Aberg": 1, "Tommy Fleetwood": 1, "Hideki Matsuyama": 1, "Brooks Koepka": 1,
-      "Jon Rahm": 1, "Xander Schauffele": 1, "Collin Morikawa": 1, "Patrick Reed": 1,
-      "Chris Gotterup": 1, "Rory McIlroy": 1, "Matt Fitzpatrick": 1, "Justin Rose": 1,
-      "Min Woo Lee": 1, "Viktor Hovland": 1, "Bryson DeChambeau": 1, "Cameron Young": 1,
-      "Robert MacIntyre": 1, "Jordan Spieth": 1, "Scottie Scheffler": 1,
-      "Shane Lowry": 2, "J.J. Spaun": 2, "Sepp Straka": 2, "Nicolai Hojgaard": 2,
-      "Sam Burns": 2, "Maverick McNealy": 2, "Russell Henley": 2, "Patrick Cantlay": 2,
-      "Adam Scott": 2, "Corey Conners": 2, "Sungjae Im": 2, "Gary Woodland": 2,
-      "Si Woo Kim": 2, "Justin Thomas": 2, "Tyrrell Hatton": 2, "Marco Penge": 2,
-      "Harris English": 2, "Akshay Bhatia": 2, "Jake Knapp": 2, "Jacob Bridgeman": 2,
-      "Jason Day": 2, "Cameron Smith": 2,
-      "Kurt Kitayama": 3, "Daniel Berger": 3, "Casey Jarvis": 3, "Dustin Johnson": 3,
-      "Ben Griffin": 3, "Alex Noren": 3, "Keegan Bradley": 3, "Sergio Garcia": 3,
-      "Max Homa": 3, "Aaron Rai": 3, "Harry Hall": 3, "Wyndham Clark": 3,
-      "Rasmus Hojgaard": 3, "Ryan Fox": 3, "Haotong Li": 3, "Max Greyserman": 3,
-      "John Keefer": 4, "Matt McCarty": 4, "Ethan Fang": 4
-    };
+// Weekend rosters — top 4 after the cut (R3 onward)
+const TEAMS = [
+  { owner: "Mike",  players: ["Ludvig Aberg", "Sepp Straka", "Sungjae Im", "Dustin Johnson"] },
+  { owner: "Nodes", players: ["Tommy Fleetwood", "Haotong Li", "Ben Griffin", "Viktor Hovland"] },
+  { owner: "Rhett", players: ["Jason Day", "Chris Gotterup", "Matt Fitzpatrick", "Ryan Fox"] },
+  { owner: "Benny", players: ["Justin Rose", "Collin Morikawa", "Justin Thomas", "Jacob Bridgeman"] },
+  { owner: "Juan",  players: ["Wyndham Clark", "Tyrrell Hatton", "Xander Schauffele", "Jordan Spieth"] },
+  { owner: "Jack",  players: ["Cameron Young", "Brooks Koepka", "Jake Knapp", "Marco Penge"] },
+  { owner: "Drake", players: ["Russell Henley", "Harris English", "Keegan Bradley", "Sergio Garcia"] },
+  { owner: "Henny", players: ["Rory McIlroy", "Max Homa", "Patrick Cantlay", "Corey Conners"] },
+  { owner: "Buso",  players: ["Sam Burns", "Patrick Reed", "Gary Woodland", "Jon Rahm"] },
+  { owner: "Gokie", players: ["Shane Lowry", "Scottie Scheffler", "Hideki Matsuyama", "Rasmus Hojgaard"] }
+];
 
-    const PAR = 72;
-    const MC_PENALTY_PER_ROUND = 8; // +8 per missed round
+const PLAYER_TIERS = {
+  "Ludvig Aberg":1,"Tommy Fleetwood":1,"Hideki Matsuyama":1,"Brooks Koepka":1,
+  "Jon Rahm":1,"Xander Schauffele":1,"Collin Morikawa":1,"Patrick Reed":1,
+  "Chris Gotterup":1,"Rory McIlroy":1,"Matt Fitzpatrick":1,"Justin Rose":1,
+  "Min Woo Lee":1,"Viktor Hovland":1,"Bryson DeChambeau":1,"Cameron Young":1,
+  "Robert MacIntyre":1,"Jordan Spieth":1,"Scottie Scheffler":1,
+  "Shane Lowry":2,"J.J. Spaun":2,"Sepp Straka":2,"Nicolai Hojgaard":2,
+  "Sam Burns":2,"Maverick McNealy":2,"Russell Henley":2,"Patrick Cantlay":2,
+  "Adam Scott":2,"Corey Conners":2,"Sungjae Im":2,"Gary Woodland":2,
+  "Si Woo Kim":2,"Justin Thomas":2,"Tyrrell Hatton":2,"Marco Penge":2,
+  "Harris English":2,"Akshay Bhatia":2,"Jake Knapp":2,"Jacob Bridgeman":2,
+  "Jason Day":2,"Cameron Smith":2,
+  "Kurt Kitayama":3,"Daniel Berger":3,"Casey Jarvis":3,"Dustin Johnson":3,
+  "Ben Griffin":3,"Alex Noren":3,"Keegan Bradley":3,"Sergio Garcia":3,
+  "Max Homa":3,"Aaron Rai":3,"Harry Hall":3,"Wyndham Clark":3,
+  "Rasmus Hojgaard":3,"Ryan Fox":3,"Haotong Li":3,"Max Greyserman":3,
+  "John Keefer":4,"Matt McCarty":4,"Ethan Fang":4
+};
 
-    // ─── NAME MATCHING ─────────────────────────────────────────────────────────────
+const PAR = 72;
+const MC_PENALTY_PER_ROUND = 8; // +8 per missed round
 
-    function normalize(name) {
-      return name.toLowerCase()
-        .replace(/[áàäå]/g, 'a').replace(/[éèë]/g, 'e').replace(/[íìï]/g, 'i')
-        .replace(/[óòöø]/g, 'o').replace(/[úùü]/g, 'u').replace(/[ñ]/g, 'n')
-        .replace(/[^a-z ]/g, '')
-        .replace(/\s+/g, ' ').trim();
-    }
+// ─── NAME MATCHING ─────────────────────────────────────────────────────────────
 
-    function matchPlayer(teamName, apiPlayers) {
-      const norm = normalize(teamName);
-      // Exact normalized match on full_name
-      let found = apiPlayers.find(p => normalize(p.full_name) === norm);
-      if (found) return found;
+function normalize(name) {
+  return name.toLowerCase()
+    .replace(/[áàäå]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i')
+    .replace(/[óòöø]/g,'o').replace(/[úùü]/g,'u').replace(/[ñ]/g,'n')
+    .replace(/[^a-z ]/g, '')
+    .replace(/\s+/g, ' ').trim();
+}
 
-      // Last name match
-      const lastName = norm.split(' ').pop();
-      const matches = apiPlayers.filter(p => normalize(p.full_name).split(' ').pop() === lastName);
-      if (matches.length === 1) return matches[0];
+function matchPlayer(teamName, apiPlayers) {
+  const norm = normalize(teamName);
+  // Exact normalized match on full_name
+  let found = apiPlayers.find(p => normalize(p.full_name) === norm);
+  if (found) return found;
 
-      // First+last partial
-      found = apiPlayers.find(p => {
-        const n = normalize(p.full_name);
-        return n.includes(norm) || norm.includes(n);
-      });
-      if (found) return found;
+  // Last name match
+  const lastName = norm.split(' ').pop();
+  const matches = apiPlayers.filter(p => normalize(p.full_name).split(' ').pop() === lastName);
+  if (matches.length === 1) return matches[0];
 
-      // Last name partial
-      found = apiPlayers.filter(p => normalize(p.full_name).includes(lastName));
-      if (found.length === 1) return found[0];
+  // First+last partial
+  found = apiPlayers.find(p => {
+    const n = normalize(p.full_name);
+    return n.includes(norm) || norm.includes(n);
+  });
+  if (found) return found;
 
-      return null;
-    }
+  // Last name partial
+  found = apiPlayers.filter(p => normalize(p.full_name).includes(lastName));
+  if (found.length === 1) return found[0];
 
-    // ─── SCORING ───────────────────────────────────────────────────────────────────
+  return null;
+}
 
-    function parseToPar(val) {
-      if (val === null || val === undefined || val === '' || val === '--') return null;
-      if (val === 'E' || val === '0' || val === 0) return 0;
-      const n = parseInt(val, 10);
-      return isNaN(n) ? null : n;
-    }
+// ─── SCORING ───────────────────────────────────────────────────────────────────
 
-    function calcTeamScores(apiPlayers) {
-      return TEAMS.map(team => {
-        let totalToPar = 0;
-        let playersWithData = 0;
-        const playerData = [];
+function parseToPar(val) {
+  if (val === null || val === undefined || val === '' || val === '--') return null;
+  if (val === 'E' || val === '0' || val === 0) return 0;
+  const n = parseInt(val, 10);
+  return isNaN(n) ? null : n;
+}
 
-        for (const playerName of team.players) {
-          const api = matchPlayer(playerName, apiPlayers);
+function calcTeamScores(apiPlayers) {
+  return TEAMS.map(team => {
+    let totalToPar = 0;
+    let playersWithData = 0;
+    const playerData = [];
 
-          if (!api) {
-            playerData.push({
-              name: playerName, tier: PLAYER_TIERS[playerName] || 0,
-              toPar: null, today: null, thru: '—', pos: '—',
-              missedCut: false, wd: false, found: false
-            });
-            continue;
-          }
+    for (const playerName of team.players) {
+      const api = matchPlayer(playerName, apiPlayers);
 
-          const toPar = parseToPar(api.topar);
-          const today = parseToPar(api.today);
-          const thru = api.thru || '—';
-          const pos = api.pos || '—';
-          const status = (api.status || '').toUpperCase();
-
-          let missedCut = status === 'C' || pos === 'CUT' || pos === 'MC';
-          let wd = status === 'W' || pos === 'WD';
-
-          let adjustedToPar = toPar;
-          // MC/WD penalties will apply after the cut — for now just use reported topar
-
-          if (toPar !== null) {
-            totalToPar += toPar;
-            playersWithData++;
-          }
-
-          playerData.push({
-            name: playerName, tier: PLAYER_TIERS[playerName] || 0,
-            toPar, today, thru, pos, missedCut, wd, found: true
-          });
-        }
-
-        // Sort players: lowest to-par first
-        playerData.sort((a, b) => {
-          if (a.toPar === null) return 1;
-          if (b.toPar === null) return -1;
-          return a.toPar - b.toPar;
+      if (!api) {
+        playerData.push({
+          name: playerName, tier: PLAYER_TIERS[playerName] || 0,
+          toPar: null, today: null, thru: '—', pos: '—',
+          missedCut: false, wd: false, found: false
         });
+        continue;
+      }
 
-        return {
-          owner: team.owner,
-          totalToPar,
-          players: playerData,
-          hasData: playersWithData > 0
-        };
-      }).sort((a, b) => {
-        if (!a.hasData && !b.hasData) return 0;
-        if (!a.hasData) return 1;
-        if (!b.hasData) return -1;
-        return a.totalToPar - b.totalToPar;
+      const toPar = parseToPar(api.topar);
+      const today = parseToPar(api.today);
+      const thru = api.thru || '—';
+      const pos = api.pos || '—';
+      const status = (api.status || '').toUpperCase();
+
+      let missedCut = status === 'C' || pos === 'CUT' || pos === 'MC';
+      let wd = status === 'W' || pos === 'WD';
+
+      let adjustedToPar = toPar;
+      // MC/WD penalties will apply after the cut — for now just use reported topar
+
+      if (toPar !== null) {
+        totalToPar += toPar;
+        playersWithData++;
+      }
+
+      playerData.push({
+        name: playerName, tier: PLAYER_TIERS[playerName] || 0,
+        toPar, today, thru, pos, missedCut, wd, found: true
       });
     }
 
-    // ─── FORMATTING ────────────────────────────────────────────────────────────────
+    // Sort players: lowest to-par first
+    playerData.sort((a, b) => {
+      if (a.toPar === null) return 1;
+      if (b.toPar === null) return -1;
+      return a.toPar - b.toPar;
+    });
 
-    function fmtToPar(n) {
-      if (n === null || n === undefined || isNaN(n)) return '—';
-      if (n === 0) return 'E';
-      return n > 0 ? '+' + n : String(n);
+    return {
+      owner: team.owner,
+      totalToPar,
+      players: playerData,
+      hasData: playersWithData > 0
+    };
+  }).sort((a, b) => {
+    if (!a.hasData && !b.hasData) return 0;
+    if (!a.hasData) return 1;
+    if (!b.hasData) return -1;
+    return a.totalToPar - b.totalToPar;
+  });
+}
+
+// ─── FORMATTING ────────────────────────────────────────────────────────────────
+
+function fmtToPar(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  if (n === 0) return 'E';
+  return n > 0 ? '+' + n : String(n);
+}
+
+function scoreClass(n) {
+  if (n === null || n === undefined || isNaN(n)) return 'even';
+  if (n < 0) return 'under';
+  if (n > 0) return 'over';
+  return 'even';
+}
+
+// ─── DATA FETCHING ────────────────────────────────────────────────────────────
+
+let dataSource = '—';
+
+async function fetchMastersData() {
+  // 1. Try Masters.com live feed (open CORS, ~24s updates)
+  try {
+    const res = await fetch('https://www.masters.com/en_US/scores/feeds/2026/scores.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('Status ' + res.status);
+    const data = await res.json();
+    if (data.data && data.data.player && data.data.player.length) {
+      dataSource = 'masters.com';
+      return data.data;
     }
+  } catch (e) {
+    console.warn('Masters.com feed failed:', e.message);
+  }
 
-    function scoreClass(n) {
-      if (n === null || n === undefined || isNaN(n)) return 'even';
-      if (n < 0) return 'under';
-      if (n > 0) return 'over';
-      return 'even';
-    }
+  // 2. Try ESPN public API
+  const espnResult = await fetchESPNFallback();
+  if (espnResult) return espnResult;
 
-    // ─── DATA FETCHING ────────────────────────────────────────────────────────────
+  return null;
+}
 
-    let dataSource = '—';
-
-    async function fetchMastersData() {
-      // 1. Try Masters.com live feed (open CORS, ~24s updates)
-      try {
-        const res = await fetch('https://www.masters.com/en_US/scores/feeds/2026/scores.json', { cache: 'no-cache' });
-        if (!res.ok) throw new Error('Status ' + res.status);
-        const data = await res.json();
-        if (data.data && data.data.player && data.data.player.length) {
-          dataSource = 'masters.com';
-          return data.data;
-        }
-      } catch (e) {
-        console.warn('Masters.com feed failed:', e.message);
+async function fetchESPNFallback() {
+  const urls = [
+    'https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard',
+    'https://site.web.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard'
+  ];
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const parsed = parseESPNToMastersFormat(data);
+      if (parsed && parsed.player && parsed.player.length) {
+        dataSource = 'ESPN';
+        return parsed;
       }
+    } catch (e) { /* try next */ }
+  }
+  return null;
+}
 
-      // 2. Try ESPN public API
-      const espnResult = await fetchESPNFallback();
-      if (espnResult) return espnResult;
+function parseESPNToMastersFormat(data) {
+  if (!data.events || !data.events.length) return null;
+  const event = data.events.find(e => (e.name || '').toLowerCase().includes('master')) || data.events[0];
+  if (!event) return null;
+  const competitors = (event.competitions || [])[0]?.competitors || [];
+  const players = competitors.map(c => {
+    const athlete = c.athlete || {};
+    const scoreStr = c.score?.displayValue || c.score?.value;
+    let topar = null;
+    if (scoreStr === 'E' || scoreStr === '0') topar = '0';
+    else if (scoreStr !== undefined) topar = scoreStr;
+    return {
+      full_name: athlete.displayName || athlete.fullName || '',
+      topar,
+      today: topar, // ESPN doesn't split today vs total cleanly in R1
+      thru: c.status?.displayValue || '—',
+      pos: c.status?.position?.displayName || '—',
+      status: ''
+    };
+  });
+  return { player: players, currentRound: String(event.status?.period || 1) };
+}
 
-      return null;
+// ─── RENDER ────────────────────────────────────────────────────────────────────
+
+function render(mastersData) {
+  const board = document.getElementById('board');
+  const updateTime = document.getElementById('updateTime');
+  const liveDot = document.getElementById('liveDot');
+  const roundStatus = document.getElementById('roundStatus');
+
+  const now = new Date();
+  updateTime.textContent = 'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (dataSource !== '—' ? ' · ' + dataSource : '');
+
+  if (!mastersData || !mastersData.player || !mastersData.player.length) {
+    liveDot.style.background = '#C8A951';
+    roundStatus.innerHTML = 'Waiting for tournament data…';
+    board.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-light);font-size:16px;">Scores will appear once play begins.</p>';
+    return;
+  }
+
+  // Determine round status
+  const currentRound = mastersData.currentRound || '1';
+  const roundNum = parseInt(currentRound, 10) || 1;
+  const activePlayers = mastersData.player.filter(p => p.status !== 'F' && p.thru !== 'F' && p.thru !== '18');
+  const isLive = activePlayers.length > 0;
+
+  if (isLive) {
+    liveDot.style.background = '#4ade80';
+    roundStatus.innerHTML = '<span class="live-badge">Live</span> Round ' + (roundNum > 4 ? 1 : roundNum);
+  } else {
+    liveDot.style.background = '#999';
+    const allFinished = mastersData.player.every(p => p.status === 'F' || p.thru === 'F' || p.thru === '18');
+    if (allFinished && roundNum <= 4) {
+      roundStatus.textContent = 'Round ' + (roundNum > 4 ? 1 : roundNum) + ' — Complete';
+    } else {
+      roundStatus.textContent = 'Round ' + (roundNum > 4 ? 1 : roundNum);
     }
+  }
 
-    async function fetchESPNFallback() {
-      const urls = [
-        'https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard',
-        'https://site.web.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard'
-      ];
-      for (const url of urls) {
-        try {
-          const res = await fetch(url, { cache: 'no-cache' });
-          if (!res.ok) continue;
-          const data = await res.json();
-          const parsed = parseESPNToMastersFormat(data);
-          if (parsed && parsed.player && parsed.player.length) {
-            dataSource = 'ESPN';
-            return parsed;
-          }
-        } catch (e) { /* try next */ }
-      }
-      return null;
-    }
+  const teams = calcTeamScores(mastersData.player);
+  let html = '';
 
-    function parseESPNToMastersFormat(data) {
-      if (!data.events || !data.events.length) return null;
-      const event = data.events.find(e => (e.name || '').toLowerCase().includes('master')) || data.events[0];
-      if (!event) return null;
-      const competitors = (event.competitions || [])[0]?.competitors || [];
-      const players = competitors.map(c => {
-        const athlete = c.athlete || {};
-        const scoreStr = c.score?.displayValue || c.score?.value;
-        let topar = null;
-        if (scoreStr === 'E' || scoreStr === '0') topar = '0';
-        else if (scoreStr !== undefined) topar = scoreStr;
-        return {
-          full_name: athlete.displayName || athlete.fullName || '',
-          topar,
-          today: topar, // ESPN doesn't split today vs total cleanly in R1
-          thru: c.status?.displayValue || '—',
-          pos: c.status?.position?.displayName || '—',
-          status: ''
-        };
-      });
-      return { player: players, currentRound: String(event.status?.period || 1) };
-    }
+  teams.forEach((team, idx) => {
+    const rank = idx + 1;
+    const isLeader = rank === 1 && team.hasData;
+    const scoreStr = team.hasData ? fmtToPar(team.totalToPar) : '—';
+    const sClass = team.hasData ? scoreClass(team.totalToPar) : 'even';
 
-    // ─── RENDER ────────────────────────────────────────────────────────────────────
-
-    function render(mastersData) {
-      const board = document.getElementById('board');
-      const updateTime = document.getElementById('updateTime');
-      const liveDot = document.getElementById('liveDot');
-      const roundStatus = document.getElementById('roundStatus');
-
-      const now = new Date();
-      updateTime.textContent = 'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (dataSource !== '—' ? ' · ' + dataSource : '');
-
-      if (!mastersData || !mastersData.player || !mastersData.player.length) {
-        liveDot.style.background = '#C8A951';
-        roundStatus.innerHTML = 'Waiting for tournament data…';
-        board.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-light);font-size:16px;">Scores will appear once play begins.</p>';
-        return;
-      }
-
-      // Save which teams are currently open
-      const openTeams = new Set();
-      board.querySelectorAll('.team-card.open').forEach(card => {
-        const teamName = card.querySelector('.team-name')?.textContent;
-        if (teamName) openTeams.add(teamName);
-      });
-
-      // Determine round status
-      const currentRound = mastersData.currentRound || '1';
-      const roundNum = parseInt(currentRound, 10) || 1;
-      const activePlayers = mastersData.player.filter(p => p.status !== 'F' && p.thru !== 'F' && p.thru !== '18');
-      const isLive = activePlayers.length > 0;
-
-      if (isLive) {
-        liveDot.style.background = '#4ade80';
-        roundStatus.innerHTML = '<span class="live-badge">Live</span> Round 2';
-      } else {
-        liveDot.style.background = '#999';
-        const allFinished = mastersData.player.every(p => p.status === 'F' || p.thru === 'F' || p.thru === '18');
-        if (allFinished && roundNum <= 4) {
-          roundStatus.textContent = 'Round ' + (roundNum > 4 ? 1 : roundNum) + ' — Complete';
-        } else {
-          roundStatus.textContent = 'Round ' + (roundNum > 4 ? 1 : roundNum);
-        }
-      }
-
-      const teams = calcTeamScores(mastersData.player);
-      let html = '';
-
-      teams.forEach((team, idx) => {
-        const rank = idx + 1;
-        const isLeader = rank === 1 && team.hasData;
-        const scoreStr = team.hasData ? fmtToPar(team.totalToPar) : '—';
-        const sClass = team.hasData ? scoreClass(team.totalToPar) : 'even';
-        const wasOpen = openTeams.has(team.owner);
-
-        html += `<div class="team-card ${isLeader ? 'leader' : ''} ${wasOpen ? 'open' : ''}" onclick="this.classList.toggle('open')">
+    html += `<div class="team-card ${isLeader ? 'leader' : ''}" onclick="this.classList.toggle('open')">
       <div class="team-header">
         <div class="team-rank">${rank}</div>
         <div class="team-name">${team.owner}</div>
@@ -835,51 +604,53 @@
           <div class="ph-total">Total</div>
         </div>`;
 
-        for (const p of team.players) {
+    for (const p of team.players) {
+      const tierBadge = p.tier ? `<span class="tier-badge tier-${p.tier}">T${p.tier}</span>` : '';
+      const statusTag = p.missedCut ? ' <span class="player-status-tag">MC</span>'
+        : p.wd ? ' <span class="player-status-tag">WD</span>' : '';
 
-          const toParStr = fmtToPar(p.toPar);
-          const todayStr = fmtToPar(p.today);
-          const totalClass = scoreClass(p.toPar);
-          const todayClass = scoreClass(p.today);
-          const thruDisplay = p.missedCut ? 'MC' : p.wd ? 'WD' : p.thru;
+      const toParStr = fmtToPar(p.toPar);
+      const todayStr = fmtToPar(p.today);
+      const totalClass = scoreClass(p.toPar);
+      const todayClass = scoreClass(p.today);
+      const thruDisplay = p.missedCut ? 'MC' : p.wd ? 'WD' : p.thru;
 
-          html += `<div class="player-row">
-        <div class="player-name">${p.name}</div>
+      html += `<div class="player-row">
+        <div class="player-name">${p.name}${tierBadge}${statusTag}</div>
         <div class="player-pos">${p.pos}</div>
         <div class="player-thru">${thruDisplay}</div>
         <div class="player-today ${todayClass}">${todayStr}</div>
         <div class="player-total ${totalClass}">${toParStr}</div>
       </div>`;
-        }
-
-        html += `</div></div>`;
-      });
-
-      board.innerHTML = html;
     }
 
-    // ─── INIT & AUTO-REFRESH ───────────────────────────────────────────────────────
+    html += `</div></div>`;
+  });
 
-    let lastData = null;
+  board.innerHTML = html;
+}
 
-    async function refresh() {
-      try {
-        const data = await fetchMastersData();
-        if (data && data.player) {
-          lastData = data;
-          render(data);
-        } else if (!lastData) {
-          render(null);
-        }
-      } catch (e) {
-        console.error('Refresh error:', e);
-        if (!lastData) render(null);
-      }
+// ─── INIT & AUTO-REFRESH ───────────────────────────────────────────────────────
+
+let lastData = null;
+
+async function refresh() {
+  try {
+    const data = await fetchMastersData();
+    if (data && data.player) {
+      lastData = data;
+      render(data);
+    } else if (!lastData) {
+      render(null);
     }
+  } catch (e) {
+    console.error('Refresh error:', e);
+    if (!lastData) render(null);
+  }
+}
 
-    refresh();
-    setInterval(refresh, 60000);
-  </script>
+refresh();
+setInterval(refresh, 60000);
+</script>
 </body>
-
 </html>
