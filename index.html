@@ -263,6 +263,58 @@
   }
   .footer strong { color: var(--text); }
 
+  /* ── Cut summary ── */
+  .cut-summary {
+    max-width: 960px; margin: 0 auto 0;
+    padding: 0 20px 32px;
+  }
+  .cut-toggle {
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; user-select: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 12px; font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0;
+    padding: 8px 0;
+    border-top: 1px solid var(--border-light);
+    width: 100%;
+    background: none; border-left: none; border-right: none; border-bottom: none;
+    text-align: left;
+  }
+  .cut-toggle:hover { color: var(--masters-green); }
+  .cut-toggle .ct-arrow { font-size: 10px; transition: transform 0.2s; }
+  .cut-toggle.open .ct-arrow { transform: rotate(180deg); }
+  .cut-body {
+    display: none;
+    margin-top: 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 13px;
+  }
+  .cut-body.open { display: block; }
+  .cut-row {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg);
+  }
+  .cut-row:last-child { border-bottom: none; }
+  .cut-row:nth-child(even) { background: var(--bg-page); }
+  .cut-owner {
+    font-weight: 800; font-size: 13px;
+    color: var(--masters-green);
+    min-width: 64px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .cut-kept { color: var(--text); flex: 1; min-width: 200px; }
+  .cut-dropped { color: var(--text-light); font-size: 12px; white-space: nowrap; }
+  .cut-dropped em { color: var(--red); font-style: normal; font-weight: 600; }
+
   /* ── Responsive ── */
   @media (max-width: 640px) {
     .header-title { font-size: 20px; }
@@ -301,6 +353,64 @@
 <div class="leaderboard">
   <p class="section-title">Leaders</p>
   <div id="board"></div>
+</div>
+
+<div class="cut-summary">
+  <button class="cut-toggle" onclick="this.classList.toggle('open'); document.getElementById('cutBody').classList.toggle('open')">
+    <span class="ct-arrow">&#9662;</span> Cut updates &amp; weekend rosters
+  </button>
+  <div class="cut-body" id="cutBody">
+    <div class="cut-row">
+      <span class="cut-owner">Jack</span>
+      <span class="cut-kept">Cameron Young (-4), Brooks Koepka (-3), Jake Knapp (-2), Marco Penge (+1)</span>
+      <span class="cut-dropped">dropped <em>Jarvis (+8)</em></span>
+    </div>
+    <div class="cut-row">
+      <span class="cut-owner">Henny</span>
+      <span class="cut-kept">Rory McIlroy (-12), Max Homa (-2), Patrick Cantlay (-1), Corey Conners (+3)</span>
+      <span class="cut-dropped">dropped <em>MacIntyre &amp; Greyserman</em></span>
+    </div>
+    <div class="cut-row">
+      <span class="cut-owner">Buso</span>
+      <span class="cut-kept">Sam Burns (-6), Patrick Reed (-6), Gary Woodland (+3), Jon Rahm (+5)</span>
+      <span class="cut-dropped">dropped <em>Bhatia &amp; Fang</em></span>
+    </div>
+    <div class="cut-row">
+      <span class="cut-owner">Nodes</span>
+      <span class="cut-kept">Tommy Fleetwood (-5), Haotong Li (-4), Ben Griffin (-3), Viktor Hovland (+1)</span>
+      <span class="cut-dropped">dropped <em>McCarty &amp; Scott (cut)</em></span>
+    </div>
+    <div class="cut-row">
+      <span class="cut-owner">Juan</span>
+      <span class="cut-kept">Wyndham Clark (-4), Tyrrell Hatton (-4), Xander Schauffele (-2), Jordan Spieth (-1)</span>
+      <span class="cut-dropped">dropped <em>Cam Smith (+7)</em></span>
+    </div>
+    <div class="cut-row">
+      <span class="cut-owner">Benny</span>
+      <span class="cut-kept">Justin Rose (-5), Collin Morikawa (-1), Justin Thomas (E), Jacob Bridgeman (+1)</span>
+      <span class="cut-dropped">dropped <em>Harry Hall (+5) &amp; Rai (cut)</em></span>
+    </div>
+    <div class="cut-row">
+      <span class="cut-owner">Rhett</span>
+      <span class="cut-kept">Jason Day (-4), Chris Gotterup (-3), Matt Fitzpatrick (-1), Ryan Fox (+5)</span>
+      <span class="cut-dropped">dropped <em>N. Hojgaard &amp; Berger</em></span>
+    </div>
+    <div class="cut-row">
+      <span class="cut-owner">Gokie</span>
+      <span class="cut-kept">Shane Lowry (-5), Scottie Scheffler (-2), Hideki Matsuyama (-2), Rasmus Hojgaard (+4)</span>
+      <span class="cut-dropped">dropped <em>Spaun &amp; Keefer</em></span>
+    </div>
+    <div class="cut-row">
+      <span class="cut-owner">Mike</span>
+      <span class="cut-kept">Ludvig Aberg (-1), Sepp Straka (-1), Sungjae Im (-1), Dustin Johnson (+1)</span>
+      <span class="cut-dropped">dropped <em>Kitayama (+8) &amp; Si Woo (cut)</em></span>
+    </div>
+    <div class="cut-row">
+      <span class="cut-owner">Drake</span>
+      <span class="cut-kept">Russell Henley (-1), Harris English (-1), Keegan Bradley (E), Sergio Garcia (+3)</span>
+      <span class="cut-dropped">dropped <em>DeChambeau &amp; Min Woo</em></span>
+    </div>
+  </div>
 </div>
 
 <div class="footer">
